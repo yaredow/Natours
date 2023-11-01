@@ -6,12 +6,6 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// app.get('/', (req, res) => {
-//   res
-//     .status(200)
-//     .json({ message: 'Hello from the server side!', app: 'Natours' });
-// });
-
 const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -90,15 +84,14 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours.json`)
 );
 
-app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours', getAllTours);
+// app.post('/api/v1/tours', createTour);
+// app.get('/api/v1/tours/:id', getTour);
+// app.patch('/api/v1/tours/:id', updateTour);
+// app.delete('/api/v1/tours/:id', deleteTour);
 
-app.get('/api/v1/tours/:id', getTour);
-
-app.patch('/api/v1/tours/:id', updateTour);
-
-app.delete('/api/v1/tours/:id', deleteTour);
-
-app.post('/api/v1/tours', createTour);
+app.route('/api/v1/tours').get(getAllTours).patch(createTour);
+app.route('/api/v1/tours').get(getTour).patch(updateTour).delete(deleteTour);
 
 const port = 3000;
 app.listen(port, () => {
