@@ -15,11 +15,11 @@ const tourSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'A tour must have a max group size'],
   },
-  difficlty: {
+  difficulty: {
     type: String,
     reguired: [true, 'A tour must have a difficlty'],
   },
-  ratingAverage: {
+  ratingsAverage: {
     type: Number,
     default: 4.5,
   },
@@ -50,6 +50,7 @@ const tourSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
+    select: false,
   },
   StartDates: [Date],
 });
