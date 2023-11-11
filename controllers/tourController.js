@@ -137,7 +137,7 @@ exports.getTourStats = async (req, res) => {
         },
       },
       {
-        $sort: { avgPrice: -1 },
+        $sort: { avgPrice: 1 },
       },
     ]);
 

@@ -60,6 +60,10 @@ const tourSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
 );
 
@@ -70,6 +74,19 @@ tourSchema.virtual('durationWeeks').get(function () {
 // DOCUMENT middleware
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+// Query middleware
+tourSchema.pre(/^find/, function (next) {
+  this.find({ secretTour: { $ne: true } });
+  next();
+});
+
+// Aggregate middleware
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  console.log(this);
   next();
 });
 // Model
