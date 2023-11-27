@@ -70,14 +70,43 @@ exports.protect = catchAsync(async (req, res, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // 3) Check if user still exists
-  const freshUser = await User.findById(decoded.id);
-  console.log(freshUser);
+  const currentUser = await User.findById(decoded.id);
 
-  if (!freshUser) {
+  if (!currentUser) {
     next(new AppError("The user belonging to this token doesn't exist", 401));
   }
   // 4) Check if the user changed password after the token is issued
-  freshUser.changedPassowrdAfter(decoded.iat);
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    next(
+      new AppError('User recently changed password! please login again.', 401),
+    );
+  }
 
+  // Grant access to protected route
+  req.user = currentUser;
   next();
 });
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError(
+          "You dont't have permission to perform this operation",
+          403,
+        ),
+      );
+    }
+    next();
+  };
+};
+
+exports.forgetPassword = catchAsync(async (req, res, next) => {
+  // Get the user based on the provided email
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    next(new AppError('There is not user with that email', 404));
+  }
+});
+exports.resetPassword = (req, res, next) => {};
