@@ -12,6 +12,15 @@ const signToken = (id) => {
   });
 };
 
+const createSendToken = (user, res, statusCode, message) => {
+  const token = signToken(user._id);
+  res.status(statusCode).json({
+    status: 'success',
+    message: message,
+    token,
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -20,15 +29,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-    data: {
-      newUser,
-    },
-  });
+  createSendToken(newUser, res, 200);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -174,4 +175,25 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     status: 'success',
     token,
   });
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const { currentPassword, password, passwordConfirm } = req.body;
+
+  const user = await User.findById(req.user.id).select('+password');
+
+  const isPasswordCorrect = await user.correctPassword(
+    currentPassword,
+    user.password,
+  );
+
+  if (!user || !isPasswordCorrect) {
+    return next(new AppError('The passowrd you provided is inccorect'), 401);
+  }
+
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  await user.save();
+
+  createSendToken(user, res, 200, 'password updated successfully');
 });
