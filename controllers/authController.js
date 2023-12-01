@@ -12,7 +12,7 @@ const signToken = (id) => {
   });
 };
 
-const createSendToken = (user, res, statusCode, message) => {
+const createSendToken = (user, res, statusCode, message = '') => {
   const token = signToken(user._id);
   res.status(statusCode).json({
     status: 'success',
@@ -45,12 +45,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, res, 200);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -169,25 +164,18 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 3) update changedPasswordAt property for the user
   // 4) Log the user(send the JWT to the user)
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, res, 200);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  const { currentPassword, password, passwordConfirm } = req.body;
+  const { passwordCurrent, password, passwordConfirm } = req.body;
 
   const user = await User.findById(req.user.id).select('+password');
 
-  const isPasswordCorrect = await user.correctPassword(
-    currentPassword,
-    user.password,
-  );
+  const isPasswordCorrect =
+    user.password && user.correctPassword(passwordCurrent, user.password);
 
-  if (!user || !isPasswordCorrect) {
+  if (!isPasswordCorrect) {
     return next(new AppError('The passowrd you provided is inccorect'), 401);
   }
 
