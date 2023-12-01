@@ -25,7 +25,7 @@ exports.getAllUsers = catchAsync(async (req, res) => {
 });
 
 exports.updateMe = catchAsync(async (req, res, next) => {
-  // check if the request contains somethig related password
+  // check if the request contains somethig related to password
   if (req.body.password || req.body.passwordConfirm) {
     next(
       new AppError(
@@ -37,15 +37,25 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   const filterBody = filterObj(req.body, 'email', 'name');
 
   // Update the user document
-  const updatedUser = await User.findByIdAndUpdate(req.params.id, filterBody, {
+  const user = await User.findByIdAndUpdate(req.user.id, filterBody, {
     new: true,
     runValidators: true,
   });
+
   res.status(200).json({
     status: 'success',
     data: {
-      user: updatedUser,
+      user,
     },
+  });
+});
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
   });
 });
 

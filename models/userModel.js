@@ -73,6 +73,11 @@ userSchema.pre(/^find/, function (next) {
   next();
 });
 
+userSchema.pre('/^find/', function (next) {
+  this.find({ active: true });
+  next();
+});
+
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,
