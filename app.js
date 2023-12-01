@@ -4,6 +4,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
+const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -35,8 +36,11 @@ app.use(express.json());
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
-// Data sanitization agains XSS
+// Data sanitization against XSS
 app.use(xss());
+
+// Preventing HTTP parameters pollution
+app.use(hpp());
 
 // Serving static files
 app.use(express.static(`${__dirname}/public`));
