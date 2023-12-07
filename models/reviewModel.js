@@ -1,9 +1,7 @@
 const mongoose = require('mongoose');
-const User = require('./userModel');
-const Tour = require('./tourModel');
 
 const reviewSchema = new mongoose.Schema({
-  review: {
+  reviews: {
     type: String,
     require: [true, 'Pleae write your review'],
   },
@@ -33,12 +31,17 @@ const reviewSchema = new mongoose.Schema({
 });
 
 reviewSchema.pre(/^find/, function (next) {
+  // this.populate({
+  //   path: 'user',
+  //   select: 'name photo',
+  // }).populate({
+  //   path: 'tour',
+  //   select: 'name',
+  // });
+
   this.populate({
     path: 'user',
-    select: 'name',
-  }).populate({
-    path: 'tour',
-    select: 'name',
+    select: 'name photo',
   });
 
   next();
