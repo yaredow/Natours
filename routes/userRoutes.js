@@ -17,7 +17,6 @@ const {
   updatePassword,
   protect,
 } = require('../controllers/authController');
-const { getOne } = require('../controllers/handlerFactory');
 
 const router = express.Router();
 router.post('/signup', signup);
