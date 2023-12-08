@@ -13,18 +13,6 @@ const filterObj = (obj, ...filteredFields) => {
   return newObj;
 };
 
-exports.getAllUsers = catchAsync(async (req, res) => {
-  const users = await User.find();
-
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      tours: users,
-    },
-  });
-});
-
 exports.updateMe = catchAsync(async (req, res, next) => {
   // check if the request contains somethig related to password
   if (req.body.password || req.body.passwordConfirm) {
@@ -60,13 +48,8 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
-  });
-};
-
+exports.getAllUsers = handlerFactory.getAll(User);
+exports.getUser = handlerFactory.getOne(User);
 exports.createUser = handlerFactory.createOne(User);
 exports.updateUser = handlerFactory.updateOne(User);
 exports.deleteUser = handlerFactory.deleteOne(User);
