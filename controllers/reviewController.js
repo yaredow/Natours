@@ -30,6 +30,13 @@ exports.getReview = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.setTourUserIds = (req, res, next) => {
+  const { tourId } = req.params;
+  if (!req.body.tour) req.body.tour = tourId;
+  if (!req.body.user) req.body.user = req.user.id;
+  next();
+};
+
 exports.createReview = handlerFactory.createOne(Review);
 exports.deleteReview = handlerFactory.deleteOne(Review);
 exports.updateReview = handlerFactory.updateOne(Review);
