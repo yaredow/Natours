@@ -16,20 +16,6 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findById(req.params.id);
-  if (!review) {
-    next(new AppError('We can not find a review with that ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      review,
-    },
-  });
-});
-
 exports.setTourUserIds = (req, res, next) => {
   const { tourId } = req.params;
   if (!req.body.tour) req.body.tour = tourId;
@@ -37,6 +23,7 @@ exports.setTourUserIds = (req, res, next) => {
   next();
 };
 
+exports.getReview = handlerFactory.getOne(Review);
 exports.createReview = handlerFactory.createOne(Review);
 exports.deleteReview = handlerFactory.deleteOne(Review);
 exports.updateReview = handlerFactory.updateOne(Review);
