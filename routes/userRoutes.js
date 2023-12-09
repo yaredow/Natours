@@ -32,7 +32,6 @@ router.patch('/updateMe', updateMe);
 router.delete('/deleteMe', deleteMe);
 
 // only the admin should be allowed to do the following
-
 router.use(restrictTo('admin'));
 router.route('/').get(getAllUsers).post(createUser);
 router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);

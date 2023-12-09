@@ -111,7 +111,6 @@ exports.restrictTo = (...roles) => {
     }
     next();
   };
-  c;
 };
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
