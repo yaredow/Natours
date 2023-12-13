@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
+const path = require('path');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -14,7 +15,12 @@ const reviewRouter = require('./routes/reviewRoute');
 
 const app = express();
 
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 // Global middlewares
+// Serving static files
+app.use(express.static(path.join(__dirname, 'public')));
+
 // Set security HTTP headers
 app.use(helmet());
 
@@ -41,10 +47,18 @@ app.use(mongoSanitize());
 app.use(xss());
 
 // Preventing HTTP parameters pollution
-app.use(hpp());
-
-// Serving static files
-app.use(express.static(`${__dirname}/public`));
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAvarage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  }),
+);
 
 // test middleware
 app.use((req, res, next) => {
@@ -54,6 +68,24 @@ app.use((req, res, next) => {
 
 console.log(process.env.NODE_ENV);
 // 3) ROUTES
+app.get('/', (req, res) => {
+  res.status(200).render('base', {
+    tour: 'The Magic Eraser',
+  });
+});
+
+app.get('/', (req, res) => {
+  res.status(200).render('overview', {
+    title: 'All tours',
+  });
+});
+
+app.get('/', (req, res) => {
+  res.status(200).render('tour', {
+    tour: 'The Magic Eraser',
+  });
+});
+
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
