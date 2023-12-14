@@ -13,6 +13,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoute');
 const viewRouter = require('./routes/viewRouter');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use('/api', limiter);
 
 // body parser. reading data from body to req.body
 app.use(express.json());
+app.use(cookieParser());
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
@@ -64,6 +66,8 @@ app.use(
 // test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
+  console.log(req.cookies);
+
   next();
 });
 
